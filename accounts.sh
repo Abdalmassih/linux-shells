@@ -2,9 +2,15 @@
 
 # this is a comment
 
-echo 'hey!'
+#function
+usage()
+{
+    echo "Usage: ${0} [-vs] [-l LENGTH]" >&2
+    echo 'Generate a random password.'
+    echo ' -l LENGTH Specify the length of the password.'
+    exit 1
+}
 
-echo "HEY"
 
 # variables
 
@@ -228,6 +234,30 @@ logger -t mytag "${MSG}" #logs to /var/log/messages
 
 
 #getopts
+#read options from user
+# l option must haveavalue (followed by acolon ":")
+LENGTH=40
+while getopts vl:s OPTION 
+do
+    case $OPTION in
+        v) 
+        VERBOSE='true'
+        echo 'verbose mode ON.'
+        ;;
+        l)
+        LENGTH=$OPTARG #value of option l
+        ;;
+        s)
+        USE_SPECIAL_CHAR='true'
+        ;;
+        ?) # ? denotes single character
+        echo 'invalid option.' >&2
+        ;;
+        *) usage #func call to display usage guide - funcs placed on top of script
+        ;;
+    esac
+    
+done
 
 
 
