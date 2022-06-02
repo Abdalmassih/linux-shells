@@ -2,6 +2,11 @@
 
 # this is a comment
 
+# DRY => Don't Repeat Yourself
+# WET => We Enjoy Typing
+# WET => Write Everything Twice
+# WET => Wasting Everybody's time
+
 #function
 usage()
 {
@@ -10,6 +15,7 @@ usage()
     echo ' -l LENGTH Specify the length of the password.'
     exit 1
 }
+
 
 
 # variables
@@ -25,6 +31,7 @@ id -un
 
 whoami
 
+#sys accounts have IDs < 1000
 echo $UID
 
 #store command output to a var
@@ -235,11 +242,14 @@ logger -t mytag "${MSG}" #logs to /var/log/messages
 
 #getopts
 #read options from user
-# l option must haveavalue (followed by acolon ":")
+# l option must have a value (followed by acolon ":")
 LENGTH=40
-while getopts vl:s OPTION 
+while getopts rvl:s OPTION
 do
     case $OPTION in
+        r)
+        REMOVE_OPTION='-r' #if not passed, will evaluate to empty string
+        ;;
         v) 
         VERBOSE='true'
         echo 'verbose mode ON.'
@@ -260,7 +270,78 @@ do
 done
 
 
+#delete a user (with its home directory)
+userdel -r
 
+#locate binaries/executable files
+which
+whereis
+sudo locate userdel #or any command e.g. php, mysql, echo...
+find / -name userdel  2>/dev/null #search recursively, hide errors
+
+#update indexes of locate
+sudo updatedb
+
+#grep
+locate userdel | grep bin #search only in 'bin'-like directories
+
+#most recently executed command
+sudo !!
+
+#config files => /etc
+#binaries => usr/bin
+#system (admin) binaries => sbin 
+
+#get list of users
+tail /etc/passwd
+
+#delete user einstein
+sudo userdel einsten
+
+id einstein # => no such user
+ls-l /home/einstein # => no such file or directory
+
+#accounts
+vi /etc/login.defs
+
+#tar (Tape ARchive) command to archive files to any storage device
+#f: filename, c: create, v: verbose, x: extract
+tar -cvf archive.tar foo bar #create archive.tar
+tar -tvf archive.tar #list files in archive
+tar -xf archive.tar #extract all files
+
+#compress file to save space
+gzip archive.tar # => archive.tar.gz
+#decompress gzipped file
+gunzip archive.tar.gz
+
+#shortcut: compress directly with tar using the -z option
+#output compressed archive file can also have a .tgz extension
+tar -zcvf archive.tar.gz /etc #backup etc config
+tar -zxvf path/to/file.tgz
+
+
+rm -rf *tar
+
+# take the very last arg on the previous command line andplace it on thecurrent command
+!$
+
+#disable/lock/expire an account for security reasons (change age)
+sudo chage -E 0 account-name
+
+#re-enable account
+sudo chage -E -1 account-name
+
+#older method: lock passwd (does not user auth with ssh keys)
+sudo passwd -l account-name
+#unlock it
+sudo passwd -u account-name
+
+#set user to nologin
+sudo usermod -s /sbin/nologin account-name
+
+#list last 3 users
+tail -3 /etc/passwd
 
 
 
