@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#enable debugging
+#!/bin/bash -xev
+
 # this is a comment
 
 # DRY => Don't Repeat Yourself
@@ -213,7 +216,7 @@ function myfunc
 {
     #set of commands...
     local FILE="${1}"
-    if [[-f "${FILE}"]] #check file exists
+    if [[-f "${FILE}"]] #check file exists, similarly -d checks directory exists (use ! for negation)
     then
         exit 1
     fi
@@ -307,7 +310,7 @@ vi /etc/login.defs
 #tar (Tape ARchive) command to archive files to any storage device
 #f: filename, c: create, v: verbose, x: extract
 tar -cvf archive.tar foo bar #create archive.tar
-tar -tvf archive.tar #list files in archive
+tar -tvf archive.tar #list files in archive (ToC)
 tar -xf archive.tar #extract all files
 
 #compress file to save space
@@ -342,6 +345,65 @@ sudo usermod -s /sbin/nologin account-name
 
 #list last 3 users
 tail -3 /etc/passwd
+
+#create dir - with parent option (create parent dir with all subdirs)
+mkdir -p /archive/users
+
+
+cut -c 1 /etc/passwd #get first char of every line
+cut -c 3-7 /etc/passwd #get chars range 3 to 7 of every line
+cut -c 3- /etc/passwd #get chars starting with 3 to last of every line
+cut -c 1,3,4 /etc/passwd #get first, third and fourth chars of every line (no reorder)
+
+#echo with escape chars, e.g. tab
+echo -e 'one\ttwo\tthree' # => one  two  three
+
+#cut by field (=column)
+echo -e 'one\ttwo\tthree' | cut -f 2 # => two
+
+#cut by delimiter
+echo 'one,two,three' | cut -d ',' -f 2 # => two
+
+cut -d ':' -f 1,3 --output-delimiter=',' /etc/passwd
+
+grep '^first' cars.csv #match lines starting with "first"
+grep 'last$' cars.csv #match lines ending with "last"
+
+#invert matching with -v
+grep -v '^first,last$' cars.csv
+
+#extended regex -E (use OR, ...)
+grep -Ev '^first|last$' cars.csv
+
+
+
+#awk is like cut, but also supports multi-char delimiters
+awk -F 'DATA:' '{print $2}' cars.dat #$2 takes contents of second field
+
+#use -OFS (output field separator) to change output delimiter
+awk -F ':' -v OFS=',' '{print $1, $3}' cars.dat
+#OR equivalently use string inside {}
+awk -F ':' -v OFS=',' '{print $3 "," $1 ", last field:" $NF}' cars.dat # $NF is the last field
+
+#list of open ports -numbers insteadof names -udp info -tcp info -listening-port 
+#use -4 to view only TCPv4 ports
+netstat -nutl | grep ':' | awk '{print $4}' | awk -F ':' '{print $NF}'
+
+#show pid (process ID) and app name with sudo and -p
+sudo netstat -nutlp # => 909/sshd
+
+#sort alphabetically
+sort /etc/passwd | less
+
+#revert sort order with -r
+sort -r /etc/passwd
+
+#sort cut result numerically with -n
+cut -d ':' -f 3 /etc/passwd | sort -n
+
+#disk usage in KB sorted numerically from largest size to lowest
+sudo du /var | sort -nr
+
 
 
 
